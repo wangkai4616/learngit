@@ -1,0 +1,105 @@
+{include file="../application/index/view/base/header.html" /}
+<style type="text/css">
+	.back_box{
+		/*background:url('/static/images/back_img.jpg');*/
+		position:fixed;top:0;left:0;width:100%;height:100%;min-height: 1000px;background-color: #393D49;
+		/*background:url('/static/images/back_img.jpg');*/
+	/*堆叠顺序 z-index: -10;background-repeat:no-repeat;图片大小自适应background-size: cover;*/
+	}
+	.login_box{
+		position:absolute;width:450px;height:350px;background-color: white;margin-left :50%;margin-top :500px;left:-250px;top:-175px;border-radius:10px;box-shadow:5px 5px 5px;border:1px solid black;
+	}
+	.layui-form-item{margin:15px;}
+	.layui-form-item .layui-form-label{width:50px;right:-30px;border-right:none;}
+	.layui-form-item .layui-input-block{left:-30px;}
+	input:focus {border:2px solid skyblue; }
+</style>
+<div class="back_box">
+	<div class="login_box">
+		<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+  			<legend>后台登录</legend>
+		</fieldset>
+		<form class="layui-form layui-form-pane" id="login_form">
+			<div class="layui-form-item">
+				<label class="layui-form-label">
+					<i class="layui-icon layui-icon-username"></i>
+				</label>
+				<div class="layui-input-block">
+					<input type="text" required lay-verify="required" id="username" autocomplete="off"  class="layui-input" placeholder="请输入账号">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">
+					<i class="layui-icon layui-icon-password"></i>
+				</label>
+				<div class="layui-input-block">
+					<input type="password" required lay-verify="required" id="password" autocomplete="off"  class="layui-input" placeholder="请输入密码">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">
+					<i class="layui-icon layui-icon-vercode"></i>
+				</label>
+				<div class="layui-input-block">
+					<input type="password" required lay-verify="required" id="captcha"  autocomplete="off"  class="layui-input" placeholder="请输入验证码" style="width:150px;display: inline-block">
+					<img src="{:url('account/verify')}" alt="captcha" id="img_ver"style="display:inline-block;top:0;width:130px;margin-left: 10px;cursor: pointer;height:35px;" onclick="reset_vercode();">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block ">
+					<button type="button" class="layui-btn" onclick="dologin()" style="width: 100%;cursor: pointer">登录</button>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block unexp">
+					<a href="#">忘记密码？</a>
+					<a href="#">没有账号？</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+	layui.use(['form','layer'],function(){
+		layer = layui.layer;
+		form = layui.form;
+		//获取焦点
+		$('#username').focus();
+		//回车登录keydown监控键盘
+		$('input').keydown(function(e){
+			if(e.keyCode == 13){
+				dologin();
+			}
+		})
+	})
+
+	// console.log(layer);
+	//验证码重新获取
+	function reset_vercode(){
+		$('#img_ver').attr('src','/index/account/verify.html?rand='+Math.random());
+	}
+
+	function dologin(){
+		var username = $.trim($('#username').val());
+		var password = $.trim($('#password').val());
+		var captcha = $.trim($('#captcha').val());
+
+		if(!username||!password||!captcha){
+			layer.msg('请检查输入不能为空!');
+			return false;
+		}
+
+		$.post('/index/account/dologin',{username:username,password:password,captcha:captcha},function(res){
+			if(res.code>0){
+				layer.msg(res.msg,{icon:2});
+				reset_vercode();
+			}else{
+				layer.msg(res.msg,{icon:1});
+				setTimeout(function(){
+					window.location.href="/index/home/index.html";
+				},1000);
+			}
+		},'json');
+	}
+</script>
+{include file="../application/index/view/base/footer.html" /}

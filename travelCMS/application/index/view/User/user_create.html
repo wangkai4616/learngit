@@ -1,0 +1,414 @@
+{include file="../application/index/view/base/header.html" /}
+<style type="text/css">
+	.container {margin-bottom: 100px;}
+	.container .layui-form .info_box{background-color: #fff;border-radius: 5px;padding: 20px;margin-bottom: 20px;}
+	.container .layui-form .info_box .layui-form-item .custorn-width{width: 80px;}
+	.container .layui-form .info_box .layui-form-item .traffic{width:300px;}
+	.container .layui-form .info_box .layui-form-item .create_trip{margin-top: 30px;}
+</style>
+<div class="container">
+	<form class="layui-form" id="ess_info">
+		<div class="info_box">
+			<h3>基本信息</h3><span><i style="color:#bbb">请注意填写正确,字段带&nbsp;*&nbsp;号为必填项目</i></span>
+	   		<hr>
+			<input type="hidden" name="aid" id="aid" value="{$Think.session.user.id}">	
+			<div class="layui-form-item">
+				<label for="userName" class="layui-form-label">*&nbsp;姓&nbsp;&nbsp;&nbsp;&nbsp;名</label>
+				<div class="layui-input-inline">
+					<input type="text" name="userName" id="userName" class="layui-input" placeholder="姓名" >
+				</div>
+				<label for="iphone" class="layui-form-label">*联系方式</label>
+				<div class="layui-input-inline">
+					<input type="phone" name="iphone" id="iphone" class="layui-input">
+				</div>
+			</div>
+
+		</div>
+		<div class="info_box">
+			<h3>行程信息</h3><span><i style="color:#bbb">请注意填写正确,字段带&nbsp;*&nbsp;号为必填项目</i></span> 	
+	   		<hr>
+	   		<div class="layui-form-item">
+				<label for="arrive_traffic" class="layui-form-label">*&nbsp;抵达交通</label>
+				<div class="layui-input-inline">
+					<select name="arrive_traffic" id="arrive_traffic" lay-verify="required">
+							{volist name="user_traffic" id="vo"}
+							<option value="{$vo.id}">{$vo.traffic}</option>
+							{/volist}
+					</select>
+				</div>
+				<label for="arrive_time" class="layui-form-label">抵达时间</label>
+				<div class="layui-input-inline">
+					<input type="text" name="arrive_time" id="arrive_time" class="layui-input" placeholder="到达时间" >
+				</div>
+				<label for="arrive_info" class="layui-form-label">抵达信息</label>
+				<div class="layui-input-inline">
+					<input type="text" name="arrive_info" id="arrive_info" class="layui-input traffic" placeholder="到达车次" >
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label for="return_traffic" class="layui-form-label">*&nbsp;返回交通</label>
+				<div class="layui-input-inline">
+					<select name="return_traffic" id="return_traffic" lay-verify="required">
+						{volist name="user_traffic" id="vo"}
+						<option value="{$vo.id}">{$vo.traffic}</option>
+						{/volist}
+					</select>
+				</div>
+				<label for="return_time" class="layui-form-label">返回时间</label>
+				<div class="layui-input-inline">
+					<input type="text" name="return_time" id="return_time" class="layui-input" placeholder="返程时间" >
+				</div>
+				<label for="return_info" class="layui-form-label">返回信息</label>
+				<div class="layui-input-inline">
+					<input type="text" name="return_info" id="return_info" class="layui-input traffic" placeholder="返程车次" >
+				</div>
+			</div>
+
+	   		<table class="layui-table" style="width: 800px;">
+			  <colgroup>
+			    <col width="200">
+			    <col width="500">
+			    <col width="100">
+			  </colgroup>
+			  <thead>
+			    <tr>
+			      <th>时间</th>
+			      <th>行程</th>
+			      <th>操作</th>
+			    </tr> 
+			  </thead>
+			  <tbody id="tirp_list">
+			    <tr>
+			      <td><input type="text" class="layui-input tirp_time" name="tirp_time" autocomplete="off"></td>
+			      <td> <select name="trip" id="trip" lay-verify="required">
+					        <option value="">请选择行程</option>
+					        {volist name="trips_list" id="vo"}
+					        <option value="{$vo.trip_id}">{$vo.trip_name}({$vo.trip_info})</option>
+					        {/volist}
+					   </select>
+				 </td>
+			      <td><button type="button" id="add_trip" class="layui-btn layui-btn-sm"><i class="layui-icon">&#xe654;</i></button></td>
+			    </tr>
+			  </tbody>
+			</table>
+			<div class="layui-form-item">
+				<label class="layui-form-label">行程含餐</label>
+				<div class="layui-input-block">
+				    <input type="radio" name="meal" value="0" title="不含餐">
+	      			<input type="radio" name="meal" value="1" title="含餐" checked>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">住宿</label>
+				<div class="layui-input-block">
+				    <input type="radio" name="hotel" value="0" title="不含住">
+	      			<input type="radio" name="hotel" value="1" title="准三" checked>
+	      			<input type="radio" name="hotel" value="2" title="准四">
+	      			<input type="radio" name="hotel" value="3" title="指定">
+	      			<input type="radio" name="hotel" value="4" title="已定">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label for="pro_Date" class="layui-form-label">住宿时间</label>
+				<div class="layui-input-inline">
+					<input type="text" id="pro_Date" name="pro_Date" class="layui-input" placeholder="请选择">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label for="stand_house" class="layui-form-label">标间</label>
+				<div class="layui-input-inline custorn-width">
+					<input type="number" name="stand" id="stand_house" class="layui-input" style="width: 80px;">
+				</div>
+				<label for="big_house" class="layui-form-label">大床</label>
+				<div class="layui-input-inline custorn-width" >
+					<input type="number" name="big_house" id="big_house" class="layui-input">
+				</div>
+				<label for="three_house" class="layui-form-label">三人间</label>
+				<div class="layui-input-inline custorn-width">
+					<input type="number" name="three_house" id="three_house" class="layui-input">
+				</div>
+				<label for="parent_house" class="layui-form-label">亲子间</label>
+				<div class="layui-input-inline custorn-width">
+					<input type="number" name="parent_house" id="parent_house" class="layui-input">
+				</div>
+			</div>
+		</div>
+		<div class="info_box">
+			<h3>游客信息</h3><span><i style="color:#bbb">身份证信息，只用填写全价客人信息</i></span> 	
+			<hr>
+			<div class="layui-form-item">
+				<label for="" class="layui-form-label">全价</label>
+				<div class="layui-input-inline custorn-width">
+					<input type="number" name="adult" class="layui-input">
+				</div>
+				<label for="" class="layui-form-label">半价</label>
+				<div class="layui-input-inline custorn-width">
+					<input type="number" name="student" class="layui-input">
+				</div>
+				<label for="" class="layui-form-label">免票</label>
+				<div class="layui-input-inline custorn-width">
+					<input type="number" name="children" class="layui-input">
+				</div>
+			</div>
+			<table class="layui-table" style="width: 700px;">
+			  <colgroup>
+			    <col width="200">
+			    <col width="400">
+			    <col width="100">
+			  </colgroup>
+			  <thead>
+			    <tr>
+			      <th>姓名</th>
+			      <th>身份证</th>
+			      <th>操作</th>
+			    </tr> 
+			  </thead>
+			  <tbody id="user_list">
+			    <tr>
+			      <td><input type="text" class="layui-input"  id="user_name1"  name="user_name"></td>
+			      <td><input type="text" class="layui-input"  id="user_id1"  name="user_id"></td>
+			      <td><button type="button" id="add_user" class="layui-btn layui-btn-sm"><i class="layui-icon">&#xe654;</i></button></td>
+			    </tr>
+			  </tbody>
+			</table>
+		</div>
+		<div class="info_box">
+			<h3>备注信息</h3><span><i style="color:#bbb">字数不大于200，不可包含特殊符号</i></span> 	
+			<div class="layui-form-item">
+				<textarea id="remarks" style="display: none;"></textarea>
+				<button class="layui-btn create_trip" id="create_trip" type="button" >创建行程</button>
+				<p><i style="color:#bbb">点击后页面将刷新，请注意填写正确,字段带&nbsp;*&nbsp;号为必填项目</i></p>
+			</div>
+	</div>
+	</form>
+</div>
+<script type="text/javascript">
+	layui.use(['form','layer','laydate','layedit'],function(){
+		layer = layui.layer;
+		form = layui.form;
+		layedit = layui.layedit;
+		laydate = layui.laydate;
+
+		//团期
+		crea_date = '';
+		over_date = '';
+		hotel_time = [];
+		laydate.render({
+			elem:"#pro_Date",
+			min:0,
+			range:true,
+			calendar: true,
+			done:function(value,date,endDate){
+				//获取开始结束时间字符串
+				crea_date = date.year + '-' + date.month + '-' + date.date;
+				over_date = endDate.year + '-' + endDate.month + '-' + endDate.date;
+				//获取开始结束时间戳
+				var crea_time = new Date(Date.parse(crea_date.replace(/-/g,"/"))).getTime();
+				var over_date = new Date(Date.parse(over_date.replace(/-/g,"/"))).getTime();
+
+				//计算总天数
+				var total_day = (over_date - crea_time)/86400000 + 1;
+				var y,m,d;
+				var str_data;
+				var str;
+				for(var i=0;i<total_day;i++){
+					//1.初始化
+					y=0;m=0;d=0;str = '';str_data = null;
+					str_data = new Date(crea_time);
+					y = str_data.getFullYear();
+					m = str_data.getMonth()+1;
+					d = str_data.getDate();
+					str = y + '-' + m + '-' + d;
+					hotel_time.push(str);
+					crea_time = crea_time+86400000;
+				}
+			}
+		});
+
+		//备注
+		demo = layedit.build('remarks',{
+			height:100,
+			tool: [
+			  'strong' //加粗
+			  ,'italic' //斜体
+			  ,'underline' //下划线
+			  ,'del' //删除线
+			  
+			  ,'|' //分割线
+			  
+			  ,'left' //左对齐
+			  ,'center' //居中对齐
+			  ,'right' //右对齐
+			]
+		});
+
+		//初始弹出框
+		laydate.render({
+			elem:'.tirp_time',
+			min:0,
+			calendar: true
+		});
+
+		laydate.render({
+			elem:'#arrive_time',
+			min:0,
+			type:'datetime',
+			calendar: true
+		});
+
+		laydate.render({
+			elem:'#return_time',
+			min:0,
+			type:'datetime',
+			calendar: true
+		});
+
+		//调用时间弹出框
+		window.getTime = function(e){
+			laydate.render({
+				elem:e,	
+				min:0,
+				calendar: true,
+				trigger: 'click'
+				// type: 'datetime'
+			});
+		};
+	
+		//添加行程
+		$('#add_trip').on('click',function(){
+			var add_html = 
+			'<tr>'
+				+'<td><input type="text" class="layui-input tirp_time" name="tirp_time" autocomplete="off" onfocus="getTime(this)" ></td>'
+				+'<td>'
+					+'<select name="trip" lay-verify="required">'
+						+'<option value="">请选择行程</option>'
+						+'{volist name="trips_list" id="vo"}'
+							+'<option value="{$vo.trip_id}">{$vo.trip_name}({$vo.trip_info})</option>'
+						+'{/volist}'
+					+'</select>'
+				+'</td>'
+				+'<td>'
+					+'<button type="button"  onclick="trip_del(this);" class="layui-btn layui-btn-sm tirp_del"><i class="layui-icon">&#xe640;</i></button>'
+				+'</td>'
+			+'</tr>';
+			$('#tirp_list').append(add_html);
+			form.render('select');
+		});
+
+		//删除多余操作
+		window.trip_del = function(obj){
+			$(obj).parent().parent().remove();
+		};
+
+		//动态增加游客信息
+		$('#add_user').on('click',function(){
+			var add_user = 
+			'<tr>\
+				<td>\
+					<input type="text" class="layui-input" name="user_name">\
+				</td>\
+				<td>\
+					<input type="text" class="layui-input"  name="user_id">\
+				</td>\
+				<td>\
+					<button type="button" id="del_user" onclick="trip_del(this);" class="layui-btn layui-btn-sm user_del"><i class="layui-icon">&#xe640;</i>\
+					</button>\
+				</td>\
+			</tr>';
+
+			$('#user_list').append(add_user);
+		});
+
+
+		$('#create_trip').on('click',function(){
+		//1.获取值
+			var aid = $('#aid').val();
+			//1.1基本信息
+			var userName = $.trim($('#userName').val());
+			var iphone = $.trim($('#iphone').val());
+			var meal = $('input[name="meal"]:checked').val();
+			var hotel = $('input[name="hotel"]:checked').val();
+
+
+			var stand_house = $.trim($('#stand_house').val());
+			var big_house = $.trim($('#big_house').val());
+			var three_house = $.trim($('#three_house').val());
+			var parent_house = $.trim($('#parent_house').val());
+			
+			//1.2行程信息
+			var arrive_traffic = $('#arrive_traffic').val();
+			var return_traffic = $('#return_traffic').val();
+			var arrive_time = $.trim($('#arrive_time').val());
+			var return_time = $.trim($('#return_time').val());
+			var arrive_info = $.trim($('#arrive_info').val());
+			var return_info = $.trim($('#return_info').val());
+
+			var trip_time = [];
+			$('input[name="tirp_time"]').each(function(j,item){
+				trip_time.push($('input[name="tirp_time"]')[j].value);
+			});
+			var trip = [];
+			$('select[name="trip"]').each(function(j,item){
+				trip.push($('select[name="trip"]')[j].value);
+			});
+
+			//1.3游客信息
+			var adult = $.trim($('input[name="adult"]').val());
+			var student  = $.trim($('input[name="student"]').val());
+			var children = $.trim($('input[name="children"]').val());
+
+			var user_name = [];
+			$.trim($('input[name="user_name"]').each(function(j,item){
+				user_name.push($('input[name="user_name"]')[j].value);
+			}));
+
+			var user_id = [];
+			$.trim($('input[name="user_id"]').each(function(j,item){
+				user_id.push($('input[name="user_id"]')[j].value);
+			}));
+
+			//1.4备注信息
+			var remarks = $.trim(layedit.getContent(demo));  
+			$.post('/index/user/user_storage',{
+				aid:aid,
+				userName:userName,
+				iphone:iphone,
+				arrive_traffic:arrive_traffic,
+				return_traffic:return_traffic,
+				arrive_time:arrive_time,
+				return_time:return_time,
+
+				arrive_info:arrive_info,
+				return_info:return_info,
+				trip_time:trip_time,
+				trip:trip,
+				meal:meal,
+				hotel:hotel,
+				hotel_time:hotel_time,
+
+				stand_house:stand_house,
+				big_house:big_house,
+				three_house:three_house,
+				parent_house:parent_house,
+
+				adult:adult,
+				student:student,
+				children:children,
+
+				user_name:user_name,
+				user_id:user_id,
+				remarks:remarks
+			},function(res){
+				if(res.code>0){
+					layer.msg(res.msg,{icon:2});
+				}else{
+					layer.msg(res.msg);
+					setTimeout(function(){
+						window.location.href="/index/user/user_list";
+					},1000);
+				}
+			},'json');
+		});
+	});
+</script>
+ {include file="../application/index/view/base/footer.html" /}

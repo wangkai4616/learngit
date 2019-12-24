@@ -1,0 +1,82 @@
+{include file="../application/index/view/base/header.html" /}
+<style>
+	.container{position: relative;width: 100%;clear: both;}
+	.container .header{position:fixed;background-color: #393D49;height: 50px;width: 100%;z-index: 0;}
+	.container .header .title a{line-height: 50px;font-size:1.8em;margin-left: 20px;color:white;}
+	.container .header .userInfo{position: absolute;right:0;line-height: 50px;font-size:1.5em;color:white;}
+	.container .header .userInfo a{color:white;}
+	.container .header .userInfo img{border-radius: 50%;border: 2px white solid;width: 30px;height: 30px;}
+
+	.container .menu{width: 200px;background-color:#393D49;position:fixed;top:50px;bottom:0;left:0;overflow-x:hidden;z-index:999}
+	.container .menu .layui-collapse,.layui-colla-item,.layui-colla-content{border:none;padding: 0;}
+	.container .menu .layui-collapse .layui-colla-item .layui-colla-title{background-color:#2F4056;color:white;}
+
+	.container .main{position: fixed;top:50px;left:200px;right: 0; button:0;background-color: #f5f7f9;padding: 20px;}
+	iframe{width: 100%;height:100%;}
+</style>
+<div class="container">
+	<div class="header">
+		<span class="title"><a href="http://www.tp.io/index/home/index.html">旅行社后台管理系统</a></span>
+		<span class="userInfo">
+			<i>{$company}</i>&nbsp;&nbsp;&nbsp;
+			<img src="{$Think.session.user.admin_img}" alt="用户头像">&nbsp;&nbsp;&nbsp;
+			<i>{$Think.session.user.username}</i>
+			<a href="javascript:;" onclick="logout()">【退出登录】</a>
+		</span>
+	</div>
+	<div class="menu">
+		<div class="layui-collapse" lay-accordion>
+			{volist name="menus" id="vo"}
+			<div class="layui-colla-item">
+				<h2 class="layui-colla-title">&nbsp;&nbsp;&nbsp;&nbsp;<i class="layui-icon {$vo.title_icon}"></i>&nbsp;&nbsp;&nbsp;&nbsp;{$vo.title}</h2>
+				<div class="layui-colla-content">
+					<!-- 因为以MID作为数组下标所以不存在[0]，需要判断当前没有 -->
+					<?php if(isset($vo['children']) && $vo['children']){?>
+					<ul class="layui-nav layui-nav-tree" lay-filter="test">
+					<!-- <ul class="layui-nav layui-nav-tree layui-nav-side" style="top:50px;"> -->
+						{volist name="$vo.children" id="v"}
+						<li class="layui-nav-item"><a href="javascript:;" onclick="menuPage(this)" src="/index/{$v.controller}/{$v.method}">{$v.title}</a></li>
+						{/volist}
+					</ul>
+					<?php }?>
+				</div>	
+			</div>
+			{/volist}
+		</div>
+	</div>
+	<div class="main">
+		<!-- <iframe src="/index/home/welcome"  id="mainFrame" frameborder="0" scrolling="no"></iframe> -->
+		<iframe src="/index/home/welcome"  onload="resetMainHeight(this)" frameborder="0" scrolling="yes"></iframe>
+	</div>
+</div>
+<script type="text/javascript">
+	layui.use(['element','layer'],function(){
+		element = layui.element;
+		layer = layui.layer;
+	})
+
+	function logout(){
+		layer.confirm('确定要退出吗？',{icon:3,title:'提示'},function(){
+			$.get('/index/account/logout',function(res){
+				if(res.code>0){
+					layer.msg(res.msg);
+				}else{
+					layer.msg(res.msg);
+					setTimeout(function(){window.location.href="/index/account/login.html"},1000);
+				}
+			},'json');
+		})
+	}
+	
+	function menuPage(obj){
+		$src = $(obj).attr('src');
+		$('iframe').attr('src',$src);
+	}
+
+	function resetMainHeight(obj){
+			var height = parent.document.documentElement.clientHeight;
+			$(obj).parent('div').height(height);
+	}
+
+</script>
+{include file="../application/index/view/base/footer.html" /}

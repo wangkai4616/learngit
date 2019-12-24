@@ -1,0 +1,171 @@
+{include file="../application/index/view/base/header.html" /}
+<style type="text/css">
+	.container {margin-bottom: 100px;}
+	.container .info_box{background-color: #fff;border-radius: 5px;padding: 20px;margin-bottom: 20px;}
+	.container .info_box .layui-form .layui-form-item .layui-input-inline{width:20%}
+	.container .info_box .layui-form .layui-form-item .layui-input-inline .order-time,.trip-start-time{display:inline-block;width:43%}
+	.container .info_box .layui-table thead{text-align:center;}
+</style>
+<div class="container">
+	<div class="info_box">
+		<h3>订单搜索</h3><hr>
+		<form class="layui-form">
+			<div class="layui-form-item">
+				<label class="layui-form-label">订单号</label>
+				<div class="layui-input-inline">
+					<input type="text" class="layui-input" name="order_number">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">联系人姓名</label>
+				<div class="layui-input-inline">
+					<input type="text" name="userName" class="layui-input">
+				</div>
+				<label class="layui-form-label">联系电话</label>
+				<div class="layui-input-inline">
+					<input type="text" name="iphone" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">下单时间</label>
+				<div class="layui-input-inline">
+					<input type="text" class="layui-input order-time" name="order_create_time" id="order_start">&nbsp;&nbsp;至&nbsp;&nbsp;
+					<input type="text" class="layui-input order-time" name="order_end_time" id="order_end">
+				</div>
+				<label class="layui-form-label">出行时间</label>
+				<div class="layui-input-inline">
+					<input type="text" class="layui-input trip-start-time" name="create_time" id="trip_start">&nbsp;&nbsp;至&nbsp;&nbsp;
+					<input type="text" class="layui-input trip-start-time" name="end_time" id="trip_end">
+				</div>
+				<button type="button" class="layui-btn layui-btn-normal" id="search">查询</button>
+				<button type="button" class="layui-btn layui-btn-normal" id="reset">重置条件</button>
+			</div>
+		</form>
+	</div>
+	<div class="info_box">
+		<table id="demo" lay-filter="test"></table>
+	</div>
+</div>
+<script type="text/html" id="barDemo">
+
+	<a class="layui-btn layui-btn-xs" lay-event="detail">查看</a>
+	<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+	<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+
+</script>
+<script type="text/javascript">
+	layui.use(['form','layer','laydate','laypage','table','laytpl'],function(){
+		layer = layui.layer;
+		form = layui.form;
+		laydate = layui.laydate;
+		laypage = layui.laypage;
+		table = layui.table;
+		laytpl = layui.laytpl;
+
+		lay('.trip-start-time').each(function(){
+   			laydate.render({
+     			elem: this
+     			,calendar: true
+     			,eventElem: '.date-input-icon'
+     			,trigger: 'click'
+   		 	});
+  		});
+
+		lay('.order-time').each(function(){
+			laydate.render({
+				elem: this
+				,calendar: true
+				,eventElem: '.date-input-icon'
+				,trigger: 'click'
+				,type:'datetime'
+			});
+		});
+
+		var tableIns = table.render({
+			elem: '#demo'
+			,height: 312
+			,url: '/index/user/user_list_info' //数据接口
+			,page: true //开启分页
+			,toolbar: true//开启工具栏
+			,cols: [[ //表头
+				{field: 'order_number', title: '订单号', width:150}
+				,{field: 'userName', title: '用户名', width:150}
+				,{field: 'iphone', title: '电话', width:300}
+				,{field: 'add_time', title: '添加时间', width:200}
+				,{field: 'trip_start_time', title: '出团日期', width: 200}
+				,{field: 'aid', title: '创建者', width: 200}
+				,{field: 'status', title: '状态', width: 150}
+				,{fixed: 'right', title: '操作',width:240, align:'center', toolbar: '#barDemo'}
+			]]
+			,defaultToolbar: ['print', 'exports', {
+				title: '提示' //标题
+				,layEvent: 'LAYTABLE_TIPS' //事件名，用于 toolbar 事件中使用
+				,icon: 'layui-icon-tips' //图标类名
+			}]
+
+		});
+
+		$('#search').on('click',function(){
+			var order_number = $.trim($("input[name='order_number']").val());
+			var order_create_time = $.trim($("input[name='order_create_time']").val());
+			var userName = $.trim($("input[name='userName']").val());
+			var iphone = $.trim($("input[name='iphone']").val());
+			var order_end_time = $.trim($("input[name='order_end_time']").val());
+			var create_time = $.trim($("input[name='create_time']").val());
+			var end_time = $.trim($("input[name='end_time']").val());
+
+			tableIns.reload({
+				where:{
+					order_number:order_number,
+					order_create_time:order_create_time,
+					userName:userName,
+					iphone:iphone,
+					order_end_time:order_end_time,
+					create_time:create_time,
+					end_time:end_time
+				}
+				,page:{
+					curr:1
+				}
+			});
+
+		});
+
+		//重置条件
+		$('#reset').on('click',function(){
+			$("input[name='order_number']").val('');
+			$("input[name='order_create_time']").val('');
+			$("input[name='userName']").val('');
+			$("input[name='iphone']").val('');
+			$("input[name='order_end_time']").val('');
+			$("input[name='create_time']").val('');
+			$("input[name='end_time']").val('');
+		});
+
+		//监听行工具事件
+		table.on('tool(test)', function(obj){ //注：tool 是工具条事件名，test 是 table 原始容器的属性 lay-filter="对应的值"
+			var data = obj.data //获得当前行数据
+					,layEvent = obj.event; //获得 lay-event 对应的值
+
+			switch (layEvent) {
+				case 'detail':window.location.href = '/index/user/order_show?uid='+data.id;break;
+				case 'del'   :
+					layer.confirm('真的删除行么', function(index){
+						layer.close(index);//关闭confirm
+						//向服务端发送删除指令
+						$.post('/index/user/order_del',{uid:data.id},function(res){
+							if(res.code === 0){
+								layer.msg(res.msg,{icon:1});
+								obj.del(); //删除对应行（tr）的DOM结构
+							}else{
+								layer.msg(res.msg,{icon:2});
+							}
+						},'json');
+					});break;
+				case 'edit'  : window.location.href = '/index/user/order_change?uid='+data.id;break;
+			}
+		})
+	});
+
+</script>
+{include file="../application/index/view/base/footer.html" /}

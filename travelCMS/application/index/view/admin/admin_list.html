@@ -1,0 +1,58 @@
+{include file="../application/index/view/base/header.html" /}
+<style type="text/css">
+    .container {margin-bottom: 100px;}
+    .container .info_box{background-color: #fff;border-radius: 5px;padding: 20px;margin-bottom: 20px;}
+</style>
+<div class="container">
+    <div class="info_box">
+        <h3>员工列表</h3>
+        <hr>
+        <table class="layui-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>用户名</th>
+                <th>真名</th>
+                <th>所属公司</th>
+                <th>状态</th>
+                <th>注册时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+                {volist name="admin_info" id="vo"}
+                    <tr>
+                        <td>{$vo.id}</td>
+                        <td>{$vo.username}</td>
+                        <td>{$vo.truename}</td>
+                        <td>{$vo.cid}</td>
+                        <td>{$vo.status}</td>
+                        <td>{$vo.add_time}</td>
+                        <td>
+                            <button class="layui-btn layui-btn-sm"  onclick="manage({$vo.id})">管理</button>
+                        </td>
+                    </tr>
+                {/volist}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+    layui.use(['layer'],function () {
+        layer = layui.layer;
+
+    });
+
+    function manage(aid){
+        layer.open({
+            type: 2,
+            content: '/index/admin/admin_manage?aid='+aid,//这里content是一个URL，如果你不想让iframe出现滚动条，你还可以content:
+            area:['500px','600px'],
+            title:['用户管理'],
+            end:function(){
+                location.reload();
+            }
+        })
+    }
+</script>
+{include file="../application/index/view/base/footer.html" /}

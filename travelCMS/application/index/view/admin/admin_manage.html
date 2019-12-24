@@ -1,0 +1,53 @@
+{include file="../application/index/view/base/header.html" /}
+<div class="container">
+    <form class="layui-form">
+        <input type="hidden" name="aid" value="{$aid}">
+        <div class="layui-form-item">
+            <label  class="layui-form-label">状态</label>
+            <div class="layui-input-block">
+                <input type="checkbox" name="status" lay-skin="switch" lay-text="正常|禁用" {if $status ==0 } checked {/if} >
+            </div>
+        </div>
+        {volist name="jurisdiction_list" id="vo"}
+        <div class="layui-form-item">
+            <label  class="layui-form-label"></label>
+            <div class="layui-input-block">
+                <input type="checkbox" name="rights[{$vo.mid}]" title="{$vo.title}" lay-skin="primary" {:isset($rights) && $rights && in_array($vo.mid,$rights)?'checked':''}>
+                <hr>
+                {volist name="vo.subordinate" id="v"}
+                <input type="checkbox" name="rights[{$v.mid}]" title="{$v.title}" lay-skin="primary" {:isset($rights) && $rights && in_array($v.mid,$rights)?'checked':''}>
+                {/volist}
+            </div>
+        </div>
+        <hr>
+        {/volist}
+        <div class="layui-form-item">
+            <label  class="layui-form-label"></label>
+            <div class="layui-input-block">
+                <button class="layui-btn" type="button" onclick="preserve()">保存</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+<script type="text/javascript">
+    layui.use(['layer','form'],function () {
+        layer = layui.layer;
+        form = layui.form;
+    });
+
+    function preserve(){
+        $.post('/index/admin/admin_manage_preserve',$('form').serialize(),function(res){
+           if(res.code>0){
+               layer.msg("更新失败！，请重试",{icon:2});
+           } else{
+               layer.msg("更新成功",{icon:1});
+               setTimeout(function () {
+                   var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                   parent.layer.close(index); //再执行关闭
+               },2000)
+           }
+        });
+    }
+</script>
+{include file="../application/index/view/base/footer.html" /}
